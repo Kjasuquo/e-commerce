@@ -1,9 +1,10 @@
 package services
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"os"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 func GenerateTokenWithMethod(signMethod *jwt.SigningMethodHMAC, claims jwt.MapClaims, secret *string) (*string, error) {
@@ -18,11 +19,11 @@ func GenerateTokenWithMethod(signMethod *jwt.SigningMethodHMAC, claims jwt.MapCl
 	return &tokenString, nil
 }
 
-func GenerateTokenWithClaims(username string) string {
+func GenerateTokenWithClaims(email string) string {
 	claims := jwt.MapClaims{
-		"exp":      time.Now().Add(time.Hour * 3).Unix(),
-		"iat":      time.Now().Unix(),
-		"username": username,
+		"exp":        time.Now().Add(time.Hour * 3).Unix(),
+		"iat":        time.Now().Unix(),
+		"user_email": email,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

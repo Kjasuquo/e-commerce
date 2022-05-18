@@ -3,6 +3,11 @@ package test
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	mock_database "github.com/decadevs/shoparena/database/mocks"
 	"github.com/decadevs/shoparena/handlers"
 	"github.com/decadevs/shoparena/models"
@@ -10,10 +15,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 func TestSearchAllProduct(t *testing.T) {

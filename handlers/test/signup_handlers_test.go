@@ -2,6 +2,12 @@ package test
 
 import (
 	"encoding/json"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	mock_database "github.com/decadevs/shoparena/database/mocks"
 	"github.com/decadevs/shoparena/handlers"
 	"github.com/decadevs/shoparena/models"
@@ -9,11 +15,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 func TestBuyerSignUpHandler(t *testing.T) {
@@ -92,7 +93,7 @@ func TestSellerSignUpHandler(t *testing.T) {
 
 	seller := models.Seller{
 		User:   user,
-		Rating: "star",
+		Rating: 5,
 	}
 	mockDb.EXPECT().FindSellerByUsername(user.Username).Return(&seller, nil)
 

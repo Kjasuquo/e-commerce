@@ -7,5 +7,5 @@ type Seller struct {
 	User
 	Product []Product `json:"product" gorm:"oneToMany"`
 	Orders  []Order   `json:"orders" gorm:"oneToMany"`
-	Rating  string    `json:"rating"`
+	Rating  int       `json:"rating"`
 }

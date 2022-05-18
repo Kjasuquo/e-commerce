@@ -1,17 +1,17 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func JSON(c *gin.Context, message string, status int, data interface{}, errs []string) {
-	responseData := gin.H{
+	responsedata := gin.H{
 		"message": message,
 		"data":    data,
 		"errors":  errs,
 		"status":  http.StatusText(status),
 	}
 
-	c.JSON(status, responseData)
+	c.JSON(status, responsedata)
 }

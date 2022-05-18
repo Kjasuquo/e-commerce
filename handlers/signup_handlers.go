@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/decadevs/shoparena/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func (h *Handler) BuyerSignUpHandler(c *gin.Context) {
@@ -53,6 +54,7 @@ func (h *Handler) BuyerSignUpHandler(c *gin.Context) {
 	}
 
 	if err = buyer.HashPassword(); err != nil {
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal Server Error",
 		})
@@ -62,7 +64,7 @@ func (h *Handler) BuyerSignUpHandler(c *gin.Context) {
 	_, err = h.DB.CreateBuyer(buyer)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"Error": "success",
+			"Error": "could not create buyer",
 		})
 		return
 	}
@@ -138,7 +140,7 @@ func (h *Handler) SellerSignUpHandler(c *gin.Context) {
 	_, err = h.DB.CreateSeller(seller)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"Error": "success",
+			"Error": "could not create seller",
 		})
 		return
 	}

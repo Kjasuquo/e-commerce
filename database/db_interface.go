@@ -2,9 +2,12 @@ package database
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/decadevs/shoparena/models"
 	"github.com/joho/godotenv"
 	"log"
+	"mime/multipart"
+	"net/http"
 	"os"
 )
 
@@ -19,20 +22,45 @@ type DB interface {
 	FindBuyerByUsername(username string) (*models.Buyer, error)
 	FindSellerByEmail(email string) (*models.Seller, error)
 	FindSellerByPhone(phone string) (*models.Seller, error)
+	UpdateUserImageURL(username, url string) error
 	FindSellerByUsername(username string) (*models.Seller, error)
 	SearchProduct(lowerPrice, upperPrice, category, name string) ([]models.Product, error)
 	TokenInBlacklist(token *string) bool
-	UpdateUser(user *models.User) error
+	UpdateBuyerProfile(id uint, update *models.UpdateUser) error
+	UpdateSellerProfile(id uint, update *models.UpdateUser) error
+	UploadFileToS3(h *session.Session, file multipart.File, fileName string, size int64) (string, error)
 	BuyerUpdatePassword(password, newPassword string) (*models.Buyer, error)
 	SellerUpdatePassword(password, newPassword string) (*models.Seller, error)
 	BuyerResetPassword(email, newPassword string) (*models.Buyer, error)
 	CreateBuyerCart(cart *models.Cart) (*models.Cart, error)
-  FindIndividualSellerShop(sellerID string) (*models.Seller, error)
+	FindIndividualSellerShop(sellerID string) (*models.Seller, error)
+	GetAllProducts() []models.Product
+	UpdateProductByID(Id uint, prod models.Product) error
+	GetAllSellers() ([]models.Seller, error)
+	GetProductByID(id uint) (*models.Product, error)
+	FindSellerProduct(sellerID string) ([]models.Product, error)
+	GetAllBuyerOrder(buyerId uint) ([]models.Order, error)
+	GetAllSellerOrder(sellerId uint) ([]models.Order, error)
+	GetAllSellerOrderCount(sellerId uint) (int, error)
+	FindPaidProduct(sellerID string) ([]models.CartProduct, error)
+	AddToCart(product models.Product, buyer *models.Buyer) error
+	GetCartProducts(buyer *models.Buyer) ([]models.CartProduct, error)
+	ViewCartProducts(addedProducts []models.CartProduct) ([]models.ProductDetails, error)
+	DeletePaidFromCart(cartID uint) error
+	GetSellersProducts(sellerID uint) ([]models.Product, error)
 }
 
 // Mailer interface to implement mailing service
 type Mailer interface {
-	SendMail(subject, body, to, Private, Domain string) bool
+	SendMail(subject, body, to, Private, Domain string) error
+	GenerateNonAuthToken(UserEmail string, secret string) (*string, error)
+	DecodeToken(token, secret string) (string, error)
+}
+
+//Paystack interface
+type Paystack interface {
+	InitializePayment(info []byte) (string, error)
+	Callback(reference string) (*http.Response, error)
 }
 
 // ValidationError defines error that occur due to validation
@@ -59,11 +87,11 @@ func InitDBParams() DBParams {
 		log.Fatal("Error loading .env file")
 	}
 
-	host := os.Getenv("DB_HOST")
+	host := os.Getenv("PDB_HOST")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
+	port := os.Getenv("PDB_PORT")
 
 	return DBParams{
 		Host:     host,

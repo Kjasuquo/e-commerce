@@ -1,19 +1,23 @@
 package middleware
 
 import (
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/decadevs/shoparena/models"
 	"github.com/decadevs/shoparena/server/response"
 	"github.com/decadevs/shoparena/services"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
 func AuthorizeSeller(findSellerByEmail func(string) (*models.Seller, error), tokenInBlacklist func(*string) bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		var seller *models.Seller
+		var error error
 		secret := os.Getenv("JWT_SECRET")
 		accToken := services.GetTokenFromHeader(c)
 		accessToken, accessClaims, err := services.AuthorizeToken(&accToken, &secret)
@@ -71,9 +75,8 @@ func AuthorizeSeller(findSellerByEmail func(string) (*models.Seller, error), tok
 			return
 		}
 
-		var user *models.Seller
 		if email, ok := accessClaims["user_email"].(string); ok {
-			if user, err = findSellerByEmail(email); err != nil {
+			if seller, error = findSellerByEmail(email); error != nil {
 				if inactiveErr, ok := err.(response.InActiveUserError); ok {
 					RespondAndAbort(c, "", http.StatusBadRequest, nil, []string{inactiveErr.Error()})
 					return
@@ -89,12 +92,14 @@ func AuthorizeSeller(findSellerByEmail func(string) (*models.Seller, error), tok
 		}
 
 		// set the user and token as context parameters.
-		c.Set("user", user)
+		c.Set("user", seller)
 		c.Set("access_token", accessToken.Raw)
 		// calling next handler
 		c.Next()
 	}
 }
+
+
 
 func AuthorizeBuyer(findBuyerByEmail func(string) (*models.Buyer, error), tokenInBlacklist func(*string) bool) gin.HandlerFunc {
 	return func(c *gin.Context) {

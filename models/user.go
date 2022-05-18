@@ -22,6 +22,14 @@ type User struct {
 	Token           string `json:"token"`
 }
 
+type UpdateUser struct {
+	FirstName   string `json:"first_name" binding:"required" form:"first_name"`
+	LastName    string `json:"last_name" binding:"required" form:"last_name"`
+	PhoneNumber string `json:"phone_number" binding:"required" form:"phone_number"`
+	Email       string `json:"email" binding:"required,email" form:"email"`
+	Address     string `json:"address"  form:"address"`
+}
+
 func (user *User) HashPassword() error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {

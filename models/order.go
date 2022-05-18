@@ -11,3 +11,12 @@ type Order struct {
 	ProductId uint `json:"product_id"`
 	Product   Product
 }
+
+type OrderProducts struct {
+	CategoryName string
+	Title        string
+	Description  string
+	Price        uint
+	Images       []Image
+	Quantity     uint
+}

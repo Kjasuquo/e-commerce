@@ -3,8 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/decadevs/shoparena/handlers"
-	"github.com/decadevs/shoparena/services"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +11,9 @@ import (
 	"time"
 
 	"github.com/decadevs/shoparena/database"
+	"github.com/decadevs/shoparena/handlers"
+	"github.com/decadevs/shoparena/services"
+
 	"github.com/decadevs/shoparena/router"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,8 @@ func Start() error {
 	//Setting up the Postgres Database
 	var PDB = new(database.PostgresDb)
 	var Mail = new(services.Service)
-	h := &handlers.Handler{DB: PDB, Mail: Mail}
+	var Paystack = services.NewPaystack()
+	h := &handlers.Handler{DB: PDB, Mail: Mail, Paystack: Paystack}
 	err := PDB.Init(values.Host, values.User, values.Password, values.DbName, values.Port)
 	if err != nil {
 		log.Println("Error trying to Init", err)

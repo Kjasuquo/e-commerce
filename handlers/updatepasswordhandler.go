@@ -3,16 +3,15 @@ package handlers
 import (
 	"github.com/decadevs/shoparena/database"
 	"github.com/decadevs/shoparena/models"
-	"github.com/decadevs/shoparena/services"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"os"
 )
 
 type Handler struct {
-	DB   database.DB
-	Mail database.Mailer
+	DB       database.DB
+	Mail     database.Mailer
+	Paystack database.Paystack
 }
 
 func PingHandler(c *gin.Context) {
@@ -22,121 +21,105 @@ func PingHandler(c *gin.Context) {
 	})
 }
 
-func (h *Handler) SendForgotPasswordEMailHandler(c *gin.Context) {
-	// crete a password reset struct and initialize it
-
-	var forgotPassword models.ResetPasswordRequest
-
-	err := c.BindJSON(&forgotPassword)
+func (h *Handler) SellerUpdatePassword(c *gin.Context) {
+	var password models.PasswordResetReq
+	userI, exists := c.Get("user")
+	if !exists {
+		c.JSON(500, gin.H{"message": "internal server get error"})
+	}
+	user, ok := userI.(*models.Seller)
+	if !ok {
+		c.JSON(500, gin.H{"message": "invalid assert"})
+	}
+	seller, err := h.DB.FindSellerByEmail(user.Email)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "please fill all fields"})
+		c.JSON(404, gin.H{"message": "User not found"})
 		c.Abort()
 		return
 	}
-	buyer, err := h.DB.FindBuyerByEmail(forgotPassword.Email)
-	// return 404 status if there is an error getting the buyer
+	err = c.BindJSON(&password)
 	if err != nil {
-		c.JSON(404, gin.H{"message": "buyer not found"})
+		c.JSON(406, gin.H{"message": "Provide all Relevant Fields"})
+		c.Abort()
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(seller.PasswordHash), []byte(password.OldPassword))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "OldPassword is incorrect"})
 		c.Abort()
 		return
 	}
 
-	// generate token that'll be used to reset the password
-	secretString := os.Getenv("JWTSECRET")
-	resetToken, _ := services.GenerateNonAuthToken(buyer.Email, &secretString)
-	// the link to be clicked in order to perform password reset
-	link := "http://localhost:5000/api/v1/password-reset?reset_token=" + resetToken
-	// define the body of the email
-	body := "Here is your reset <a href='" + link + "'>link</a>"
-	html := "<strong>" + body + "</strong>"
-
-	//intialize the email sendout
-	privateAPIKey := os.Getenv("MAILGUN_API_KEY")
-	yourDomain := os.Getenv("DOMAIN_STRING")
-	email := h.Mail.SendMail("forgot Password", html, buyer.Email, privateAPIKey, yourDomain)
-
-	//if email was sent return 200 status code
-	if email == true {
-		c.JSON(200, gin.H{"message": "please check your email for password reset link"})
-		c.Abort()
-		return
-	} else {
-		c.JSON(500, gin.H{"message": "something went wrong while trying to send you a mail, please try again"})
+	if password.NewPassword != password.ConfirmNewPassword {
+		c.JSON(400, gin.H{"message": "Password Mismatch, Please make sure newpassword & confirmNewPassword match"})
 		c.Abort()
 		return
 	}
-
+	passwordhash, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), bcrypt.DefaultCost)
+	_, err = h.DB.SellerUpdatePassword(seller.PasswordHash, string(passwordhash))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	c.JSON(200, gin.H{"message": "successfully reset password"})
 }
 
-func (h *Handler) ForgotPasswordResetHandler(c *gin.Context) {
-	// instance of the forgot password request
-	var password models.ForgotPassword
-	// requires all fields aand returns an error if some fields are missing
+func (h *Handler) BuyerUpdatePassword(c *gin.Context) {
+	var password models.PasswordResetReq
+	userI, exists := c.Get("user")
+	log.Println("testtttt", userI)
+	if !exists {
+		c.JSON(500, gin.H{"message": "internal server get error"})
+	}
+	user, ok := userI.(*models.Buyer)
+	if !ok {
+		c.JSON(500, gin.H{"message": "invalid assert"})
+	}
+
 	err := c.BindJSON(&password)
 	if err != nil {
-		// Return response when we some fields are missing
-		log.Println(err)
-		c.JSON(406, gin.H{"message": "please provide all fields"})
+		c.JSON(406, gin.H{"message": "Provide all Relevant Fields"})
 		c.Abort()
 		return
 	}
 
-	// verifies if the new password string and the string confirmation string match
 	if password.NewPassword != password.ConfirmNewPassword {
-		// Return response when passwords mismatch
-		c.JSON(400, gin.H{"message": "password mismatch"})
+		c.JSON(400, gin.H{"message": "Password Mismatch"})
 		c.Abort()
 		return
 	}
 
-	// gets the reset token from the dynamic route
-	resetToken, _ := c.GetQuery("reset_token")
-
-	// decodes token to get user email
-	userEmail, err := services.DecodeToken(resetToken)
+	buyer, err := h.DB.FindBuyerByEmail(user.Email)
 	if err != nil {
-		// Return response when we get an error while decoding the token
+		c.JSON(500, gin.H{"message": "Internal Server Error"})
+		c.Abort()
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(buyer.PasswordHash), []byte(password.OldPassword))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "OldPassword is incorrect"})
+		c.Abort()
+		return
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
 		log.Println(err)
-		c.JSON(500, gin.H{"message": "Something wrong happened, Please try again later"})
-		c.Abort()
 		return
 	}
-	// check the db for a buyer with the email decoded from the token
-	buyer, err := h.DB.FindBuyerByEmail(userEmail)
+	_, err = h.DB.BuyerUpdatePassword(buyer.PasswordHash, string(passwordHash))
 	if err != nil {
-		// Return response when we get an error while fetching buyer
-		log.Println(err)
-		c.JSON(500, gin.H{"message": "buyer not found"})
-		c.Abort()
-		return
-	}
-
-	// generates a new password hash from the password string in the password reset request
-	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), bcrypt.DefaultCost)
-	if err != nil {
-		// Return response when we get an error while hatching the password
 		log.Println(err)
 		c.JSON(500, gin.H{"message": "internal server error"})
 		c.Abort()
 		return
 	}
-
-	// resets the buyer password hash by email in the database
-	_, err = h.DB.BuyerResetPassword(buyer.Email, string(newPasswordHash))
-	if err != nil {
-		// Return response if we are not able to update user password
-		c.JSON(500, gin.H{"message": "Somehting happened while updating your password try again"})
-		c.Abort()
-		return
-	}
-
-	// returns a response after successfully resetting the password
-	c.JSON(200, gin.H{"message": "password reset successful"})
-	c.Abort()
-	return
+	c.JSON(200, gin.H{"message": "successfully reset password"})
 }
 
-func (h *Handler) SellerResetPassword(c *gin.Context) {
+/*
+func (h *Handler) SellerUpdatePasswordHandler(c *gin.Context) {
 	var password models.PasswordResetReq
 	email := c.Param("email")
 	seller, err := h.DB.FindSellerByEmail(email)
@@ -172,7 +155,7 @@ func (h *Handler) SellerResetPassword(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "successfully reset password"})
 }
 
-func (h *Handler) BuyerResetPassword(c *gin.Context) {
+func (h *Handler) BuyerUpdatePasswordHandler(c *gin.Context) {
 	var password models.PasswordResetReq
 
 	email := c.Param("email")
@@ -218,3 +201,5 @@ func (h *Handler) BuyerResetPassword(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"message": "successfully reset password"})
 }
+
+*/
