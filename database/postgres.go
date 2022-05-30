@@ -881,3 +881,20 @@ func (pdb *PostgresDb) DeleteCartProduct(buyerID, cartProductID uint) error {
 
 	return err
 }
+
+func (pdb *PostgresDb) DeleteAllFromCart(buyerID uint) error {
+	cart := &models.Cart{}
+	cartProduct := &models.CartProduct{}
+
+	err := pdb.DB.Where("buyer_id = ?", buyerID).First(cart).Error
+	if err != nil {
+		return err
+	}
+
+	err = pdb.DB.Where("cart_id = ?", cart.ID).Delete(cartProduct).Error
+	if err != nil {
+		return err
+	}
+
+	return err
+}

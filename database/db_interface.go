@@ -56,6 +56,7 @@ type DB interface {
 	FindSellerIndividualProduct(sellerID uint) (*models.Product, error)
 	FindCartProductSeller(sellerID, productID uint) (*models.CartProduct, error)
 	DeleteCartProduct(buyerID, cartProductID uint) error
+	DeleteAllFromCart(buyerID uint) error
 }
 
 // Mailer interface to implement mailing service

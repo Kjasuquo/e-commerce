@@ -58,6 +58,7 @@ func SetupRouter(h *handlers.Handler) (*gin.Engine, string) {
 		authorizedRoutesBuyer.PUT("/buyer/updatepassword", h.BuyerUpdatePassword)
 		authorizedRoutesBuyer.PUT("/uploadbuyerpic", h.UploadBuyerImageHandler)
 		authorizedRoutesBuyer.DELETE("/deletefromcart/:id", h.DeleteFromCart)
+		authorizedRoutesBuyer.DELETE("/deleteallcart", h.DeleteAllCartProducts)
 	}
 	authorizedRoutesSeller := apirouter.Group("/")
 	authorizedRoutesSeller.Use(middleware.AuthorizeSeller(h.DB.FindSellerByEmail, h.DB.TokenInBlacklist))
