@@ -45,16 +45,17 @@ func TestGetProductById(t *testing.T) {
 
 	//an instance of product
 	product := models.Product{
-		testGorm,
-		2,
-		4,
-		category,
-		"RubberGloves",
-		"Blue, latex,",
-		600,
-		sliceImages,
-		6,
-		1000,
+		Model:       testGorm,
+		SellerId:    2,
+		CategoryId:  4,
+		Category:    category,
+		Title:       "RubberGloves",
+		Description: "Blue, latex",
+		Price:       600,
+		Images:      sliceImages,
+		Rating:      6,
+		Quantity:    1000,
+
 	}
 	bodyJSON, err := json.Marshal(product)
 	if err != nil {

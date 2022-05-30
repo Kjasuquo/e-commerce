@@ -78,7 +78,8 @@ func (h *Handler) LoginBuyerHandler(c *gin.Context) {
 		response.JSON(c, "", http.StatusInternalServerError, nil, []string{"internal server error"})
 		return
 	}
-
+	c.Header("refresh_token", *refreshToken)
+	c.Header("access_token", *accToken)
 	response.JSON(c, "login successful", http.StatusOK, gin.H{
 		"user":          buyer,
 		"access_token":  *accToken,

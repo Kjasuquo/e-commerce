@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
 	"github.com/decadevs/shoparena/models"
 	"github.com/gin-gonic/gin"
 )

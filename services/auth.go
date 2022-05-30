@@ -92,17 +92,16 @@ func CheckSupportedFile(filename string) (string, bool) {
 	return fileExtension, !supportedFileTypes[fileExtension]
 }
 func PreAWS(fileExtension, folder string) (*session.Session, string, error) {
+	secret := os.Getenv("AWS_SECRET_KEY")
+	id := os.Getenv("AWS_SECRET_ID")
 	tempFileName := folder + "/" + uuid.NewString() + fileExtension
 	session, err := session.NewSession(&aws.Config{
-		Region: aws.String(os.Getenv("AWS_REGION")),
-		Credentials: credentials.NewStaticCredentials(
-			os.Getenv("AWS_SECRET_ID"),
-			os.Getenv("AWS_SECRET_KEY"),
-			os.Getenv("AWS_TOKEN"),
-		),
+		Region:      aws.String(os.Getenv("AWS_SECRET_REGION")),
+		Credentials: credentials.NewStaticCredentials(secret, id, ""),
 	})
 	return session, tempFileName, err
 }
+
 func (s *Service) GenerateNonAuthToken(UserEmail string, secret string) (*string, error) {
 
 	// Define expiration time

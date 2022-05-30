@@ -70,7 +70,7 @@ func TestGetProducts(t *testing.T) {
 			return
 		}
 		route.ServeHTTP(rw, req)
-		assert.Equal(t, http.StatusFound, rw.Code)
+		assert.Equal(t, http.StatusOK, rw.Code)
 		assert.Contains(t, rw.Body.String(), string(bodyJSON))
 	})
 

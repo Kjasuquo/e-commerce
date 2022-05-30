@@ -25,7 +25,7 @@ func (h *Handler) AllBuyerOrders(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"Buyer Order": buyerWithOrder,
+		"Buyer_Order": buyerWithOrder,
 	})
 }
 
@@ -43,7 +43,7 @@ func (h *Handler) AllSellerOrders(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"Seller Order": sellerWithOrder,
+		"Seller_Order": sellerWithOrder,
 	})
 
 }
@@ -63,7 +63,7 @@ func (h *Handler) SellerTotalOrders(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"Order count": orderCount,
+		"OrderCount": orderCount,
 	})
 
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) HandleGetSellerShopByProfileAndProduct() gin.HandlerFunc {
@@ -17,7 +16,7 @@ func (h *Handler) HandleGetSellerShopByProfileAndProduct() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, []string{"internal server error"})
 			return
 		}
-		sellerID := strconv.Itoa(int(seller.ID))
+		sellerID := seller.ID
 
 		//find seller with the retrieved ID and return the seller and its product
 		Seller, err := h.DB.FindIndividualSellerShop(sellerID)

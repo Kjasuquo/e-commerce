@@ -86,9 +86,10 @@ func (s *Server) setupRouter() *gin.Engine {
 		AllowHeaders:     []string{"*"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		// AllowOriginFunc: func(origin string) bool {
-		// 	return origin == "https://github.com"
-		// },
+		//https://oja-ecommerce.herokuapp.com
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "https://oja-ecommerce.herokuapp.com"
+		},
 		MaxAge: 12 * time.Hour,
 	}))
 	s.defineRoutes(r)

@@ -9,7 +9,8 @@ import (
 func (h *Handler) GetAllProducts(c *gin.Context) {
 	products := h.DB.GetAllProducts()
 
-	c.JSON(http.StatusFound, gin.H{
-		"All Products": products,
-	})
+	//c.JSON(http.StatusOK, gin.H{
+	//	"all_Products": products,
+	//})
+	c.JSON(http.StatusOK, products)
 }

@@ -7,7 +7,6 @@ import (
 )
 
 func (h *Handler) SearchProductHandler(c *gin.Context) {
-	//Equivalent to param
 	categoryName := c.Query("category")
 	lowerPrice := c.Query("lower-price")
 	upperPrice := c.Query("upper-price")
@@ -16,7 +15,8 @@ func (h *Handler) SearchProductHandler(c *gin.Context) {
 	product, err := h.DB.SearchProduct(lowerPrice, upperPrice, categoryName, name)
 	if err != nil {
 		log.Println("handler error in search product", err)
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, "Product Not found")
+		return
 	}
 
 	if len(product) == 0 {
@@ -24,5 +24,5 @@ func (h *Handler) SearchProductHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusFound, product)
+	c.JSON(http.StatusOK, product)
 }

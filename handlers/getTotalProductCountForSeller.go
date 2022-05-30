@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 //GET TOTAL PRODUCT COUNT FOR A SELLER
@@ -17,7 +17,7 @@ func (h *Handler) GetTotalProductCountForSeller(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, []string{"internal server error"})
 		return
 	}
-	sellerID := strconv.Itoa(int(seller.ID))
+	sellerID := seller.ID
 
 	//find seller with the retrieved ID and return the seller and its preloaded product
 	Seller, err := h.DB.FindIndividualSellerShop(sellerID)
@@ -30,57 +30,22 @@ func (h *Handler) GetTotalProductCountForSeller(c *gin.Context) {
 		return
 	}
 
-	//find seller product , retrived by ID and return the seller product quantity
-	product, err := h.DB.FindSellerProduct(sellerID)
-	if err != nil {
-		log.Println("Error finding information in database:", err)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"Message": "Error Exist count not find seller product",
-			"error":   err.Error(),
-		})
-		return
-	}
-
-	//get seller slice of products
-	sellerProducts := Seller.Product
-
-	//number of products in slice of products
-	productLength := len(sellerProducts)
-
-	//count all products in slice == length pf slice
-	var countAllProduct int
-
 	//sum of the quantity of each product
 	var total_quantity uint
 
-	//if seller do not have product return, i.e. do run the below code
-	if productLength == 0 {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Message": "Seller do not have product to sell",
-			"Value":   countAllProduct,
-		})
-		return
-	}
-	//total count based on the category
-	for i := 0; i < productLength; i++ {
-		countAllProduct++
-	}
-
+	product := Seller.Product
 	//total count based on the individual product
-	for i := 0; i < productLength; i++ {
+	for i := 0; i < len(product); i++ {
 		total_quantity += product[i].Quantity
 	}
 
-	//individual quantity of products can be gotten by
-	quantity := product[1].Quantity
-
 	//total count based on an individual product
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"Message":                "Seller has " + strconv.Itoa(countAllProduct) + " different categories of product to sell",
+		"Message":                fmt.Sprintf("Seller has %d different categories of product to sell", len(product)),
 		"Seller_ID":              sellerID,
-		"Product_Count":          countAllProduct,
+		"Product_Count":          len(product),
 		"Product_Quantity":       total_quantity,
-		"First_Product_Quantity": quantity,
+		"First_Product_Quantity": product[0].Quantity,
 	})
 
 }
@@ -93,12 +58,12 @@ func (h *Handler) SellerIndividualProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, []string{"internal server error"})
 		return
 	}
-	sellerID := strconv.Itoa(int(seller.ID))
+	sellerID := seller.ID
 
 	product, err := h.DB.FindSellerProduct(sellerID)
 	if err != nil {
 		log.Println("Error finding information in database:", err)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"Message": "Error Exist Count not find individual seller product",
 			"error":   err.Error(),
 		})

@@ -50,20 +50,14 @@ func TestAllSellerOrders(t *testing.T) {
 	buyerID := uint(gofakeit.Number(1, 10))
 	productID := uint(gofakeit.Number(1, 10))
 	sellerFirstName := gofakeit.FirstName()
-	//buyerFirstName := gofakeit.FirstName()
 	sellerLastName := gofakeit.LastName()
-	//buyerLastName := gofakeit.LastName()
 	sellerUserName := gofakeit.Username()
-	//buyerUserName := gofakeit.Username()
 	sellerPhone := gofakeit.Phone()
-	//buyerPhone := gofakeit.Phone()
 	productCategory := gofakeit.CarModel()
 	productTitle := gofakeit.CarType()
 	productDescriptn := gofakeit.CarType()
 	productPrice := gofakeit.Price(1200, 1000000)
 	convPrice := uint(productPrice)
-	//productImage := gofakeit.ImageURL(200, 500)
-	//rating := uint(rand.Intn(5))
 	quantity := uint(gofakeit.Number(1, 100))
 
 	address := "lagos"
@@ -172,7 +166,11 @@ func TestAllSellerOrders(t *testing.T) {
 	mockDB.EXPECT().FindSellerByEmail(testSeller.Email).Return(&testSeller, nil)
 
 	t.Run("Testing for Successful Request", func(t *testing.T) {
+
+		mockDB.EXPECT().GetAllSellerOrder(uint(5)).Return(testOrders, nil)
+
 		mockDB.EXPECT().GetAllSellerOrder(uint(5)).Return(testOrders, nil).AnyTimes()
+
 		rw := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/sellerorders/", strings.NewReader(string(bodyJSON)))
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *acc))

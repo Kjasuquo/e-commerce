@@ -6,8 +6,9 @@ import (
 
 type Product struct {
 	gorm.Model
-	SellerId    uint `json:"seller_id"`
-	CategoryId  uint
+	SellerId uint `json:"seller_id"`
+
+	CategoryId  uint `gorm:"foreignKey:categories(id)" json:"category_id"`
 	Category    Category
 	Title       string  `json:"title"`
 	Description string  `json:"description"`

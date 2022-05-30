@@ -99,8 +99,6 @@ func AuthorizeSeller(findSellerByEmail func(string) (*models.Seller, error), tok
 	}
 }
 
-
-
 func AuthorizeBuyer(findBuyerByEmail func(string) (*models.Buyer, error), tokenInBlacklist func(*string) bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -182,6 +180,7 @@ func AuthorizeBuyer(findBuyerByEmail func(string) (*models.Buyer, error), tokenI
 		// set the user and token as context parameters.
 		c.Set("user", buyer)
 		c.Set("access_token", accessToken.Raw)
+
 		// calling next handler
 		c.Next()
 	}

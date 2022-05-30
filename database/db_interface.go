@@ -22,32 +22,39 @@ type DB interface {
 	FindBuyerByUsername(username string) (*models.Buyer, error)
 	FindSellerByEmail(email string) (*models.Seller, error)
 	FindSellerByPhone(phone string) (*models.Seller, error)
-	UpdateUserImageURL(username, url string) error
+	UpdateBuyerImageURL(username, url string, buyerID uint) error
+	UpdateSellerImageURL(username, url string, sellerID uint) error
 	FindSellerByUsername(username string) (*models.Seller, error)
 	SearchProduct(lowerPrice, upperPrice, category, name string) ([]models.Product, error)
 	TokenInBlacklist(token *string) bool
 	UpdateBuyerProfile(id uint, update *models.UpdateUser) error
 	UpdateSellerProfile(id uint, update *models.UpdateUser) error
 	UploadFileToS3(h *session.Session, file multipart.File, fileName string, size int64) (string, error)
+	CreateProduct(product models.Product) error
+	GetCategory(category string) (*models.Category, error)
+	DeleteProduct(productID, sellerID uint) error
 	BuyerUpdatePassword(password, newPassword string) (*models.Buyer, error)
 	SellerUpdatePassword(password, newPassword string) (*models.Seller, error)
 	BuyerResetPassword(email, newPassword string) (*models.Buyer, error)
+	SellerResetPassword(email, newPassword string) (*models.Seller, error)
 	CreateBuyerCart(cart *models.Cart) (*models.Cart, error)
-	FindIndividualSellerShop(sellerID string) (*models.Seller, error)
+	FindIndividualSellerShop(sellerID uint) (*models.Seller, error)
 	GetAllProducts() []models.Product
 	UpdateProductByID(Id uint, prod models.Product) error
 	GetAllSellers() ([]models.Seller, error)
 	GetProductByID(id uint) (*models.Product, error)
-	FindSellerProduct(sellerID string) ([]models.Product, error)
+	FindSellerProduct(sellerID uint) ([]models.Product, error)
 	GetAllBuyerOrder(buyerId uint) ([]models.Order, error)
 	GetAllSellerOrder(sellerId uint) ([]models.Order, error)
 	GetAllSellerOrderCount(sellerId uint) (int, error)
-	FindPaidProduct(sellerID string) ([]models.CartProduct, error)
+	FindPaidProduct(sellerID uint) ([]models.CartProduct, error)
 	AddToCart(product models.Product, buyer *models.Buyer) error
 	GetCartProducts(buyer *models.Buyer) ([]models.CartProduct, error)
 	ViewCartProducts(addedProducts []models.CartProduct) ([]models.ProductDetails, error)
 	DeletePaidFromCart(cartID uint) error
 	GetSellersProducts(sellerID uint) ([]models.Product, error)
+	FindSellerIndividualProduct(sellerID uint) (*models.Product, error)
+	FindCartProductSeller(sellerID, productID uint) (*models.CartProduct, error)
 }
 
 // Mailer interface to implement mailing service

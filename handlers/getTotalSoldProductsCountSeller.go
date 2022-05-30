@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) GetTotalSoldProductCount(c *gin.Context) {
@@ -19,12 +18,12 @@ func (h *Handler) GetTotalSoldProductCount(c *gin.Context) {
 		return
 	}
 
-	sellerID := strconv.Itoa(int(seller.ID))
+	sellerID := seller.ID
 	//FIND THE cart HANDLER FUNCTION AND CALL IT HERE
 	cartProduct, err := h.DB.FindPaidProduct(sellerID)
 	if err != nil {
 		log.Println("Error finding information in database:", err)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"Message": "Error Exist is finding sold product",
 			"error":   err.Error(),
 		})
@@ -32,15 +31,16 @@ func (h *Handler) GetTotalSoldProductCount(c *gin.Context) {
 	}
 
 	//FIND THE ORDERS AND CALL THE FUNCTION HERE
-	var soldProductCount int
+	var soldProductCount uint
 
 	for i := 0; i < len(cartProduct); i++ {
-		soldProductCount++
+		soldProductCount += cartProduct[i].TotalQuantity
 	}
 
 	if soldProductCount == 0 {
 		c.IndentedJSON(http.StatusOK, gin.H{
-			"Message": "No Product has been Purchased",
+			"Message":      "No Product has been Purchased",
+			"Product_sold": soldProductCount,
 		})
 		return
 	}
