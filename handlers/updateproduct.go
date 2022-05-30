@@ -21,8 +21,6 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 	prodID, _ := strconv.Atoi(prod)
 	prodIdUint := uint(prodID)
 
-	//prodID := seller.ID
-
 	var product = models.Product{}
 
 	if err := c.BindJSON(&product); err != nil {
