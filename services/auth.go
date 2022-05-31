@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const AccessTokenValidity = time.Minute * 20
+const AccessTokenValidity = time.Hour * 24
 const RefreshTokenValidity = time.Hour * 24
 
 type Claims struct {

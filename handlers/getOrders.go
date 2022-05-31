@@ -12,7 +12,7 @@ func (h *Handler) AllBuyerOrders(c *gin.Context) {
 	user, present := c.Get("user")
 	if !present {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"message": "you are not logged in"})
+			"error": "you are not logged in"})
 	}
 
 	buyer := user.(*models.Buyer)
@@ -32,7 +32,8 @@ func (h *Handler) AllBuyerOrders(c *gin.Context) {
 func (h *Handler) AllSellerOrders(c *gin.Context) {
 	user, present := c.Get("user")
 	if !present {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"message": "you are not logged in"})
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "you are not logged in"})
 	}
 	seller := user.(*models.Seller)
 	sellerWithOrder, err := h.DB.GetAllSellerOrder(seller.ID)
@@ -51,7 +52,8 @@ func (h *Handler) AllSellerOrders(c *gin.Context) {
 func (h *Handler) SellerTotalOrders(c *gin.Context) {
 	user, present := c.Get("user")
 	if !present {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"message": "you are not logged in"})
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "you are not logged in"})
 	}
 	seller := user.(*models.Seller)
 

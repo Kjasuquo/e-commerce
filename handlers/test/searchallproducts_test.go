@@ -148,7 +148,7 @@ func TestSearchAllProduct(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/searchproducts", strings.NewReader(string(productJSON)))
 		route.ServeHTTP(rw, req)
 		fmt.Println(rw.Code)
-		assert.Equal(t, http.StatusFound, rw.Code)
+		assert.Equal(t, http.StatusOK, rw.Code)
 		assert.Contains(t, rw.Body.String(), string(productJSON))
 
 	})
@@ -170,7 +170,7 @@ func TestSearchAllProduct(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/searchproducts?category=shirt&lower-price=3000&upper-price=8000&name=shirts", strings.NewReader(string(productcat1JSON)))
 		route.ServeHTTP(rw, req)
 		fmt.Println(rw.Code)
-		assert.Equal(t, http.StatusFound, rw.Code)
+		assert.Equal(t, http.StatusOK, rw.Code)
 		assert.Contains(t, rw.Body.String(), string(productcat1JSON))
 
 	})

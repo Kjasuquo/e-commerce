@@ -27,14 +27,14 @@ type PostgresDb struct {
 // Init sets up the mongodb instance
 func (pdb *PostgresDb) Init(host, user, password, dbName, port string) error {
 	fmt.Println("connecting to Database.....")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Africa/Lagos",
-		host, user, password, dbName, port)
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Africa/Lagos", host, user, password, dbName, port)
 	var err error
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Println(err)
 		return err
 	}
+
 	if db == nil {
 		return fmt.Errorf("database was not initialized")
 	} else {
@@ -101,73 +101,64 @@ func (pdb *PostgresDb) PrePopulateTables() error {
 	if result.RowsAffected < 1 {
 		pdb.DB.Create(&seller)
 	}
-	Product := models.Product{
+	product := models.Product{
 		Model:       gorm.Model{},
 		SellerId:    1,
 		CategoryId:  1,
 		Category:    models.Category{},
 		Title:       "shoes",
 		Description: "loafers",
-		Price:       5000,
+		Price:       30,
 		Images:      nil,
 		Rating:      4,
 		Quantity:    3,
-	}
-	result = pdb.DB.Where("product = ?", "shoes").Find(&Product)
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&Product)
 	}
 	Product1 := models.Product{
 		Model:       gorm.Model{},
 		SellerId:    1,
-		CategoryId:  1,
+		CategoryId:  2,
 		Category:    models.Category{},
-		Title:       "shoes",
-		Description: "Trainers",
-		Price:       5000,
+		Title:       "toaster",
+		Description: "sony press on toaster",
+		Price:       420,
 		Images:      nil,
 		Rating:      4,
 		Quantity:    3,
 	}
-	result = pdb.DB.Where("product = ?", "Trainers").Find(&Product)
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&Product1)
-	}
-	Product2 := models.Product{
+	product2 := models.Product{
 		Model:       gorm.Model{},
 		SellerId:    1,
-		CategoryId:  1,
+		CategoryId:  3,
 		Category:    models.Category{},
-		Title:       "clothes",
-		Description: "summer",
-		Price:       5000,
+		Title:       "lip gloss",
+		Description: "fenty beauty shimmer gloss",
+		Price:       76,
 		Images:      nil,
 		Rating:      4,
 		Quantity:    3,
-	}
-	result = pdb.DB.Where("product = ?", "clothes").Find(&Product)
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&Product2)
 	}
 	Product3 := models.Product{
 		Model:       gorm.Model{},
 		SellerId:    1,
-		CategoryId:  1,
+		CategoryId:  4,
 		Category:    models.Category{},
-		Title:       "sandals",
-		Description: "footwear",
-		Price:       5000,
+		Title:       "pampers",
+		Description: "7 in 1 pamper pack",
+		Price:       100,
 		Images:      nil,
 		Rating:      4,
 		Quantity:    3,
 	}
-	result = pdb.DB.Where("product = ?", "sandals").Find(&Product)
-
+	result = pdb.DB.Where("title = ?", "shoes").Find(&product)
 	if result.RowsAffected < 1 {
+		pdb.DB.Create(&product)
+		pdb.DB.Create(&Product1)
+		pdb.DB.Create(&product2)
 		pdb.DB.Create(&Product3)
 	}
 
 	return nil
+
 }
 
 //GET ALL PRODUCTS FROM DB
@@ -270,9 +261,67 @@ func (pdb *PostgresDb) SearchProduct(lowerPrice, upperPrice, categoryName, name 
 			fmt.Println(err)
 			return nil, err
 		}
+	}
 
-		category := categories.ID
-
+	category := categories.ID
+	if LPInt == 0 && UPInt == 0 && name == "" {
+		err := pdb.DB.Where("category_id = ?", category).Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if LPInt == 0 && name == "" {
+		err := pdb.DB.Where("category_id = ?", category).
+			Where("price <= ?", uint(UPInt)).Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if UPInt == 0 && name == "" {
+		err := pdb.DB.Where("category_id = ?", category).
+			Where("price >= ?", uint(LPInt)).Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if LPInt != 0 && UPInt != 0 && name == "" {
+		err := pdb.DB.Where("category_id = ?", category).Where("price >= ?", uint(LPInt)).
+			Where("price <= ?", uint(UPInt)).Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if LPInt == 0 && UPInt == 0 && name != "" {
+		err := pdb.DB.Where("category_id = ?", category).
+			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if LPInt == 0 && name != "" {
+		err := pdb.DB.Where("category_id = ?", category).
+			Where("price <= ?", uint(UPInt)).
+			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else if UPInt == 0 && name != "" {
+		err := pdb.DB.Where("category_id = ?", category).
+			Where("price >= ?", uint(LPInt)).
+			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else {
+		err := pdb.DB.Where("category_id = ?", category).Where("price >= ?", uint(LPInt)).
+			Where("price <= ?", uint(UPInt)).
+			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 		if lowerPrice == "Lower Price Limit" && upperPrice == "Upper Price Limit" && name == "" {
 			err := pdb.DB.Where("category_id = ?", category).Find(&products).Error
 			if err != nil {
@@ -479,7 +528,7 @@ func (pdb *PostgresDb) UpdateSellerProfile(id uint, update *models.UpdateUser) e
 	return result.Error
 }
 
-// UploadFileToS3 saves a file to aws bucket and returns the url to the file and an error if there's any
+// UploadFileToS3 send FileToS3 saves a file to aws bucket and returns the url to the file and an error if there's any
 func (pdb *PostgresDb) UploadFileToS3(h *session.Session, file multipart.File, fileName string, size int64) (string, error) {
 	// get the file size and read the file content into a buffer
 	buffer := make([]byte, size)
@@ -852,6 +901,22 @@ func (pdb *PostgresDb) FindSellerIndividualProduct(sellerID uint) (*models.Produ
 
 }
 
+func (pdb *PostgresDb) AddTokenToBlacklist(email string, token string) error {
+	blacklisted := models.Blacklist{}
+	blacklisted.Token = token
+	blacklisted.Email = email
+	blacklisted.CreatedAt = time.Now()
+
+	err := pdb.DB.Create(&blacklisted).Error
+	if err != nil {
+		log.Println("error in ad token to blacklist")
+		return err
+	}
+	log.Println("token added to blacklist")
+	return nil
+
+}
+
 func (pdb *PostgresDb) FindCartProductSeller(sellerID, productID uint) (*models.CartProduct, error) {
 
 	//initiating an instance of a cart product
@@ -863,6 +928,15 @@ func (pdb *PostgresDb) FindCartProductSeller(sellerID, productID uint) (*models.
 	}
 
 	return cartProduct, nil
+}
+
+func (pdb *PostgresDb) DeleteAllSellerProducts(sellerID uint) error {
+	product := models.Product{}
+	err := pdb.DB.Where("id = ?", sellerID).Delete(&product).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (pdb *PostgresDb) DeleteCartProduct(buyerID, cartProductID uint) error {
@@ -879,7 +953,7 @@ func (pdb *PostgresDb) DeleteCartProduct(buyerID, cartProductID uint) error {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (pdb *PostgresDb) DeleteAllFromCart(buyerID uint) error {
@@ -895,6 +969,5 @@ func (pdb *PostgresDb) DeleteAllFromCart(buyerID uint) error {
 	if err != nil {
 		return err
 	}
-
-	return err
+	return nil
 }

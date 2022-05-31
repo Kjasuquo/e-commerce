@@ -59,6 +59,7 @@ func SetupRouter(h *handlers.Handler) (*gin.Engine, string) {
 		authorizedRoutesBuyer.PUT("/uploadbuyerpic", h.UploadBuyerImageHandler)
 		authorizedRoutesBuyer.DELETE("/deletefromcart/:id", h.DeleteFromCart)
 		authorizedRoutesBuyer.DELETE("/deleteallcart", h.DeleteAllCartProducts)
+		authorizedRoutesBuyer.POST("/buyer/logout", h.HandleLogoutBuyer)
 	}
 	authorizedRoutesSeller := apirouter.Group("/")
 	authorizedRoutesSeller.Use(middleware.AuthorizeSeller(h.DB.FindSellerByEmail, h.DB.TokenInBlacklist))
@@ -80,6 +81,8 @@ func SetupRouter(h *handlers.Handler) (*gin.Engine, string) {
 		authorizedRoutesSeller.GET("/seller/allproducts", h.SellerAllProducts)
 		authorizedRoutesSeller.GET("/seller/remaining/product/count", h.GetRemainingProductsCountSellerCount)
 		authorizedRoutesBuyer.PUT("/uploadsellerpic", h.UploadSellerImageHandler)
+		authorizedRoutesSeller.POST("/seller/logout", h.HandleLogoutSeller)
+		authorizedRoutesSeller.DELETE("/deleteallsellerproducts/:seller_id", h.DeleteAllSellerProducts)
 	}
 
 	port := ":" + os.Getenv("PORT")
