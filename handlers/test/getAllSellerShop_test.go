@@ -137,13 +137,13 @@ func TestHandleGetSellerShopByProfileAndProduct(t *testing.T) {
 	}
 
 	//authentication and authorisation
-	mockDB.EXPECT().TokenInBlacklist(gomock.Any()).Return(false).Times(2)
-	mockDB.EXPECT().FindSellerByEmail(testSeller.Email).Return(&testSeller, nil).Times(2)
+	mockDB.EXPECT().TokenInBlacklist(gomock.Any()).Return(false).Times(2).AnyTimes()
+	mockDB.EXPECT().FindSellerByEmail(testSeller.Email).Return(&testSeller, nil).Times(2).AnyTimes()
 
 	t.Run("Testing for Bad/Wrong Request", func(t *testing.T) {
 		mockDB.EXPECT().FindIndividualSellerShop(testShopID).Return(nil, errors.New("Error Exist"))
 		rw := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/seller/shop", strings.NewReader(string(bodyJSON)))
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/seller/shop/:testShopID", strings.NewReader(string(bodyJSON)))
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *acc))
 		route.ServeHTTP(rw, req)
 		fmt.Println(rw.Body.String())
@@ -154,7 +154,7 @@ func TestHandleGetSellerShopByProfileAndProduct(t *testing.T) {
 	t.Run("Testing for success", func(t *testing.T) {
 		mockDB.EXPECT().FindIndividualSellerShop(testShopID).Return(&testSeller, nil)
 		rw := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/seller/shop", strings.NewReader(string(bodyJSON)))
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/seller/shop/:testShopID", strings.NewReader(string(bodyJSON)))
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *acc))
 		route.ServeHTTP(rw, req)
 		fmt.Println(rw.Body.String())

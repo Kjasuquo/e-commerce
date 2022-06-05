@@ -17,7 +17,7 @@ func (h *Handler) AllBuyerOrders(c *gin.Context) {
 
 	buyer := user.(*models.Buyer)
 
-	buyerWithOrder, err := h.DB.GetAllBuyerOrder(buyer.ID)
+	buyerWithOrder, err := h.DB.GetAllBuyerOrders(buyer.ID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "unable to get order(s)",
@@ -36,7 +36,7 @@ func (h *Handler) AllSellerOrders(c *gin.Context) {
 			"error": "you are not logged in"})
 	}
 	seller := user.(*models.Seller)
-	sellerWithOrder, err := h.DB.GetAllSellerOrder(seller.ID)
+	sellerWithOrder, err := h.DB.GetAllSellerOrders(seller.ID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "unable to get order(s)",

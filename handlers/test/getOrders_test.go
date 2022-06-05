@@ -47,8 +47,8 @@ func TestAllSellerOrders(t *testing.T) {
 	categoryID := uint(gofakeit.Number(1, 9))
 	sellerID := uint(5)
 
-	buyerID := uint(gofakeit.Number(1, 10))
-	productID := uint(gofakeit.Number(1, 10))
+	//buyerID := uint(gofakeit.Number(1, 10))
+	//productID := uint(gofakeit.Number(1, 10))
 	sellerFirstName := gofakeit.FirstName()
 	sellerLastName := gofakeit.LastName()
 	sellerUserName := gofakeit.Username()
@@ -60,8 +60,6 @@ func TestAllSellerOrders(t *testing.T) {
 	convPrice := uint(productPrice)
 	quantity := uint(gofakeit.Number(1, 100))
 
-	address := "lagos"
-
 	//instantiating the gorm model object/struct
 	testGormModel := gorm.Model{
 		ID:        Id,
@@ -70,29 +68,29 @@ func TestAllSellerOrders(t *testing.T) {
 	}
 
 	//instantiating the user model object/struct
-	testUserModel := models.User{
-		Model:       testGormModel,
-		FirstName:   sellerFirstName,
-		LastName:    sellerLastName,
-		Email:       sellerEmail,
-		Username:    sellerUserName,
-		Address:     address,
-		PhoneNumber: sellerPhone,
-	}
+	//testUserModel := models.User{
+	//	Model:       testGormModel,
+	//	FirstName:   sellerFirstName,
+	//	LastName:    sellerLastName,
+	//	Email:       sellerEmail,
+	//	Username:    sellerUserName,
+	//	Address:     address,
+	//	PhoneNumber: sellerPhone,
+	//}
 
 	//instantiating the seller object/struct
-	testSellerModel := models.Seller{
-		Model:   testGormModel,
-		User:    testUserModel,
-		Product: nil,
-		Orders:  nil,
-	}
-	//instantiating the buyer object/struct
-	testBuyerModel := models.Buyer{
-		Model:  testGormModel,
-		User:   testUserModel,
-		Orders: nil,
-	}
+	//testSellerModel := models.Seller{
+	//	Model:   testGormModel,
+	//	User:    testUserModel,
+	//	Product: nil,
+	//	Orders:  nil,
+	//}
+	////instantiating the buyer object/struct
+	//testBuyerModel := models.Buyer{
+	//	Model:  testGormModel,
+	//	User:   testUserModel,
+	//	Orders: nil,
+	//}
 
 	category := models.Category{
 		testGormModel,
@@ -110,36 +108,33 @@ func TestAllSellerOrders(t *testing.T) {
 	}
 	//instantiating the buyer object/struct
 
-	orderOne := models.Order{
-		testGormModel,
-		sellerID,
-		testSellerModel,
-		buyerID,
-		testBuyerModel,
-		productID,
-		product,
+	orderOne := models.OrderProducts{
+		Fname:        sellerFirstName,
+		Lname:        sellerLastName,
+		CategoryName: productCategory,
+		Title:        productTitle,
+		Price:        convPrice,
+		Quantity:     quantity,
 	}
-	orderTwo := models.Order{
-		testGormModel,
-		sellerID,
-		testSellerModel,
-		buyerID,
-		testBuyerModel,
-		productID,
-		product,
+	orderTwo := models.OrderProducts{
+		Fname:        sellerFirstName,
+		Lname:        sellerLastName,
+		CategoryName: productCategory,
+		Title:        productTitle,
+		Price:        convPrice,
+		Quantity:     quantity,
 	}
 
-	orderThree := models.Order{
-		testGormModel,
-		sellerID,
-		testSellerModel,
-		buyerID,
-		testBuyerModel,
-		productID,
-		product,
+	orderThree := models.OrderProducts{
+		Fname:        sellerFirstName,
+		Lname:        sellerLastName,
+		CategoryName: productCategory,
+		Title:        productTitle,
+		Price:        convPrice,
+		Quantity:     quantity,
 	}
 
-	testOrders := []models.Order{orderOne, orderTwo, orderThree}
+	testOrders := []models.OrderProducts{orderOne, orderTwo, orderThree}
 	testUser := models.User{
 		Model:        testGormModel,
 		FirstName:    sellerFirstName,
@@ -162,14 +157,14 @@ func TestAllSellerOrders(t *testing.T) {
 	}
 
 	//authentication and authorisation
-	mockDB.EXPECT().TokenInBlacklist(gomock.Any()).Return(false)
-	mockDB.EXPECT().FindSellerByEmail(testSeller.Email).Return(&testSeller, nil)
+	mockDB.EXPECT().TokenInBlacklist(gomock.Any()).Return(false).AnyTimes()
+	mockDB.EXPECT().FindSellerByEmail(testSeller.Email).Return(&testSeller, nil).AnyTimes()
 
 	t.Run("Testing for Successful Request", func(t *testing.T) {
 
-		mockDB.EXPECT().GetAllSellerOrder(uint(5)).Return(testOrders, nil)
+		mockDB.EXPECT().GetAllSellerOrders(uint(5)).Return(testOrders, nil).AnyTimes()
 
-		mockDB.EXPECT().GetAllSellerOrder(uint(5)).Return(testOrders, nil).AnyTimes()
+		mockDB.EXPECT().GetAllSellerOrders(uint(5)).Return(testOrders, nil).AnyTimes()
 
 		rw := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/sellerorders/", strings.NewReader(string(bodyJSON)))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/decadevs/shoparena/models"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 	"log"
 	"mime/multipart"
@@ -59,6 +60,8 @@ type DB interface {
 	DeleteAllFromCart(buyerID uint) error
 	AddTokenToBlacklist(email string, token string) error
 	DeleteAllSellerProducts(sellerID uint) error
+	GetAllSellerOrders(sellerId uint) ([]models.OrderProducts, error)
+	GetAllBuyerOrders(buyerId uint) ([]models.OrderProducts, error)
 }
 
 // Mailer interface to implement mailing service
@@ -72,6 +75,7 @@ type Mailer interface {
 type Paystack interface {
 	InitializePayment(info []byte) (string, error)
 	Callback(reference string) (*http.Response, error)
+	PayStackDecodeToken(token, secret string) (jwt.MapClaims, error)
 }
 
 // ValidationError defines error that occur due to validation

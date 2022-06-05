@@ -16,28 +16,28 @@ func (s *Service) SendMail(subject, body, recipient, Private, Domain string) err
 
 	mg := mailgun.NewMailgun(yourDomain, privateAPIKey)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	// Create a new template
-	err := mg.CreateTemplate(ctx, &mailgun.Template{
-		Name: "i_template",
-		Version: mailgun.TemplateVersion{
-			Template: `'<div class="entry"> <h1>{{.title}}</h1> <div class="body"> {{.body}} </div> </div>'`,
-			Engine:   mailgun.TemplateEngineGo,
-			Tag:      "v1",
-		},
-	})
-	if err != nil {
-		return err
-	}
+	//// Create a new template
+	//err := mg.CreateTemplate(ctx, &mailgun.Template{
+	//	Name: "i_template",
+	//	Version: mailgun.TemplateVersion{
+	//		Template: `'<div class="entry"> <h1>{{.title}}</h1> <div class="body"> {{.body}} </div> </div>'`,
+	//		Engine:   mailgun.TemplateEngineGo,
+	//		Tag:      "v1",
+	//	},
+	//})
+	//if err != nil {
+	//	return err
+	//}
 
 	// Create a new message with template
 	m := mg.NewMessage("Oja Ecommerce <Oja@Decadev.gon>", subject, "")
 	m.SetTemplate("i_template")
 
 	// Add recipients
-	err = m.AddRecipient(recipient)
+	err := m.AddRecipient(recipient)
 	if err != nil {
 		return err
 	}

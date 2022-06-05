@@ -19,6 +19,6 @@ func (h *Handler) SellerAllProducts(c *gin.Context) {
 		})
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"Seller Products": sellerProducts,
+		"SellerProducts": sellerProducts,
 	})
 }

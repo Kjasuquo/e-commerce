@@ -192,62 +192,57 @@ func (pdb *PostgresDb) SearchProduct(lowerPrice, upperPrice, categoryName, name 
 	var LPInt int
 	var UPInt int
 
-	if lowerPrice != "Lower Price Limit" {
-		LPInt, _ = strconv.Atoi(lowerPrice)
-	}
-
-	if upperPrice != "Upper Price Limit" {
-		UPInt, _ = strconv.Atoi(upperPrice)
-	}
+	LPInt, _ = strconv.Atoi(lowerPrice)
+	UPInt, _ = strconv.Atoi(upperPrice)
 
 	if categoryName == "All Categories" {
-		if lowerPrice == "Lower Price Limit" && upperPrice == "Upper Price Limit" && name == "" {
+		if LPInt == 0 && UPInt == 0 && name == "" {
 			err := pdb.DB.Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
 			return products, nil
-		} else if lowerPrice == "Lower Price Limit" && upperPrice != "Upper Price Limit" && name == "" {
+		} else if LPInt == 0 && UPInt != 0 && name == "" {
 			err := pdb.DB.Where("price <= ?", uint(UPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice == "Upper Price Limit" && name == "" {
+		} else if LPInt != 0 && UPInt == 0 && name == "" {
 			err := pdb.DB.Where("price >= ?", uint(LPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice != "Upper Price Limit" && name == "" {
+		} else if LPInt != 0 && UPInt != 0 && name == "" {
 			err := pdb.DB.Where("price >= ?", uint(LPInt)).
 				Where("price <= ?", uint(UPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice == "Lower Price Limit" && upperPrice == "Upper Price Limit" && name != "" {
+		} else if LPInt == 0 && UPInt == 0 && name != "" {
 			err := pdb.DB.Where("title LIKE ?", "%"+name+"%").Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice == "Lower Price Limit" && upperPrice != "Upper Price Limit" && name != "" {
+		} else if LPInt == 0 && name != "" {
 			err := pdb.DB.Where("price <= ?", uint(UPInt)).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice == "Upper Price Limit" && name != "" {
+		} else if UPInt == 0 && name != "" {
 			err := pdb.DB.Where("price >= ?", uint(LPInt)).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice != "Upper Price Limit" && name != "" {
+		} else if LPInt != 0 && UPInt != 0 && name != "" {
 			err := pdb.DB.Where("price >= ?", uint(LPInt)).Where("price <= ?", uint(UPInt)).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
 			if err != nil {
@@ -261,102 +256,42 @@ func (pdb *PostgresDb) SearchProduct(lowerPrice, upperPrice, categoryName, name 
 			fmt.Println(err)
 			return nil, err
 		}
-	}
-
-	category := categories.ID
-	if LPInt == 0 && UPInt == 0 && name == "" {
-		err := pdb.DB.Where("category_id = ?", category).Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if LPInt == 0 && name == "" {
-		err := pdb.DB.Where("category_id = ?", category).
-			Where("price <= ?", uint(UPInt)).Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if UPInt == 0 && name == "" {
-		err := pdb.DB.Where("category_id = ?", category).
-			Where("price >= ?", uint(LPInt)).Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if LPInt != 0 && UPInt != 0 && name == "" {
-		err := pdb.DB.Where("category_id = ?", category).Where("price >= ?", uint(LPInt)).
-			Where("price <= ?", uint(UPInt)).Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if LPInt == 0 && UPInt == 0 && name != "" {
-		err := pdb.DB.Where("category_id = ?", category).
-			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if LPInt == 0 && name != "" {
-		err := pdb.DB.Where("category_id = ?", category).
-			Where("price <= ?", uint(UPInt)).
-			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else if UPInt == 0 && name != "" {
-		err := pdb.DB.Where("category_id = ?", category).
-			Where("price >= ?", uint(LPInt)).
-			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else {
-		err := pdb.DB.Where("category_id = ?", category).Where("price >= ?", uint(LPInt)).
-			Where("price <= ?", uint(UPInt)).
-			Where("title LIKE ?", "%"+name+"%").Find(&products).Error
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-		if lowerPrice == "Lower Price Limit" && upperPrice == "Upper Price Limit" && name == "" {
+		category := categories.ID
+		if LPInt == 0 && UPInt == 0 && name == "" {
 			err := pdb.DB.Where("category_id = ?", category).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice == "Lower Price Limit" && upperPrice != "Upper Price Limit" && name == "" {
+		} else if LPInt == 0 && name == "" {
 			err := pdb.DB.Where("category_id = ?", category).
 				Where("price <= ?", uint(UPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice == "Upper Price Limit" && name == "" {
+		} else if UPInt == 0 && name == "" {
 			err := pdb.DB.Where("category_id = ?", category).
 				Where("price >= ?", uint(LPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice != "Upper Price Limit" && name == "" {
+		} else if LPInt != 0 && UPInt != 0 && name == "" {
 			err := pdb.DB.Where("category_id = ?", category).Where("price >= ?", uint(LPInt)).
 				Where("price <= ?", uint(UPInt)).Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice == "Lower Price Limit" && upperPrice == "Upper Price Limit" && name != "" {
+		} else if LPInt == 0 && UPInt == 0 && name != "" {
 			err := pdb.DB.Where("category_id = ?", category).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
 			if err != nil {
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice == "Lower Price Limit" && upperPrice != "Upper Price Limit" && name != "" {
+		} else if LPInt == 0 && name != "" {
 			err := pdb.DB.Where("category_id = ?", category).
 				Where("price <= ?", uint(UPInt)).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
@@ -364,7 +299,7 @@ func (pdb *PostgresDb) SearchProduct(lowerPrice, upperPrice, categoryName, name 
 				fmt.Println(err)
 				return nil, err
 			}
-		} else if lowerPrice != "Lower Price Limit" && upperPrice == "Upper Price Limit" && name != "" {
+		} else if UPInt == 0 && name != "" {
 			err := pdb.DB.Where("category_id = ?", category).
 				Where("price >= ?", uint(LPInt)).
 				Where("title LIKE ?", "%"+name+"%").Find(&products).Error
@@ -382,7 +317,6 @@ func (pdb *PostgresDb) SearchProduct(lowerPrice, upperPrice, categoryName, name 
 			}
 		}
 	}
-
 	return products, nil
 }
 
@@ -627,7 +561,37 @@ func (pdb *PostgresDb) GetAllBuyerOrder(buyerId uint) ([]models.Order, error) {
 	return buyerOrder, nil
 }
 
-// GetAllSellerOrder fetches all buyer orders
+//GetAllBuyerOrders fetches all buyer orders
+func (pdb *PostgresDb) GetAllBuyerOrders(buyerId uint) ([]models.OrderProducts, error) {
+	var buyerOrder []models.Order
+
+	var result []models.OrderProducts
+
+	if err := pdb.DB.Where("buyer_id =?", buyerId).
+		Preload("Seller").
+		Preload("Buyer").
+		Preload("Product").
+		Preload("Product.Category").
+		Find(&buyerOrder).
+		Error; err != nil {
+		log.Println("could not find order", err)
+		return nil, err
+	}
+	for i := 0; i < len(buyerOrder); i++ {
+		re := models.OrderProducts{
+			Fname:        buyerOrder[i].Seller.FirstName,
+			Lname:        buyerOrder[i].Seller.LastName,
+			CategoryName: buyerOrder[i].Product.Category.Name,
+			Title:        buyerOrder[i].Product.Title,
+			Price:        buyerOrder[i].Product.Price,
+			Quantity:     buyerOrder[i].Product.Quantity,
+		}
+		result = append(result, re)
+	}
+	return result, nil
+}
+
+// GetAllSellerOrder fetches all seller orders
 func (pdb *PostgresDb) GetAllSellerOrder(sellerId uint) ([]models.Order, error) {
 	var sellerOrder []models.Order
 	if err := pdb.DB.Where("seller_id= ?", sellerId).Preload("Seller").
@@ -639,6 +603,33 @@ func (pdb *PostgresDb) GetAllSellerOrder(sellerId uint) ([]models.Order, error) 
 		return nil, err
 	}
 	return sellerOrder, nil
+}
+
+// GetAllSellerOrders fetches all seller orders
+func (pdb *PostgresDb) GetAllSellerOrders(sellerId uint) ([]models.OrderProducts, error) {
+	var sellerOrder []models.Order
+
+	var result []models.OrderProducts
+	if err := pdb.DB.Where("seller_id= ?", sellerId).Preload("Seller").
+		Preload("Buyer").
+		Preload("Product").
+		Preload("Product.Category").
+		Find(&sellerOrder).
+		Error; err != nil {
+		return nil, err
+	}
+	for i := 0; i < len(sellerOrder); i++ {
+		re := models.OrderProducts{
+			Fname:        sellerOrder[i].Buyer.FirstName,
+			Lname:        sellerOrder[i].Buyer.LastName,
+			CategoryName: sellerOrder[i].Product.Category.Name,
+			Title:        sellerOrder[i].Product.Title,
+			Price:        sellerOrder[i].Product.Price,
+			Quantity:     sellerOrder[i].Product.Quantity,
+		}
+		result = append(result, re)
+	}
+	return result, nil
 }
 
 // GetAllSellerOrderCount fetches all buyer orders
@@ -807,10 +798,11 @@ func (pdb *PostgresDb) ViewCartProducts(addedProducts []models.CartProduct) ([]m
 			return nil, err
 		}
 		prodDetail := models.ProductDetails{
-			Name:     product.Title,
-			Price:    addedProducts[i].TotalPrice,
-			Quantity: addedProducts[i].TotalQuantity,
-			Images:   product.Images,
+			Name:          product.Title,
+			Price:         addedProducts[i].TotalPrice,
+			Quantity:      addedProducts[i].TotalQuantity,
+			Images:        product.Images,
+			CartProductID: addedProducts[i].ID,
 		}
 
 		details = append(details, prodDetail)

@@ -1,25 +1,21 @@
 package handlers
 
 import (
+	"github.com/decadevs/shoparena/models"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) HandleGetSellerShopByProfileAndProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		//authorize and authenticate seller
-		seller, err := h.GetUserFromContext(c)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, []string{"internal server error"})
-			return
-		}
-		sellerID := seller.ID
+		sID := c.Param("id")
+		sellerID, _ := strconv.Atoi(sID)
 
 		//find seller with the retrieved ID and return the seller and its product
-		Seller, err := h.DB.FindIndividualSellerShop(sellerID)
+		Seller, err := h.DB.FindIndividualSellerShop(uint(sellerID))
 
 		if err != nil {
 			log.Println("Error finding information in database:", err)
@@ -36,11 +32,13 @@ func (h *Handler) HandleGetSellerShopByProfileAndProduct() gin.HandlerFunc {
 			})
 			return
 		}
+		var Shop []models.Seller
+		Shop = append(Shop, *Seller)
 
 		//5. return a json object of seller profile and product if found
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Message":     "Found Seller Shop by Profile and Product",
-			"Seller_Shop": Seller,
+			"Seller_Shop": Shop,
 		})
 
 	}

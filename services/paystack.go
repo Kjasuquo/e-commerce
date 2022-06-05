@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -81,4 +82,18 @@ func (p *PayStack) Callback(reference string) (*http.Response, error) {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func (p *PayStack) PayStackDecodeToken(token, secret string) (jwt.MapClaims, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+
+	})
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return claims, err
 }

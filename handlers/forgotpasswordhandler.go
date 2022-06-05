@@ -30,7 +30,8 @@ func (h *Handler) BuyerForgotPasswordEMailHandler(c *gin.Context) {
 	secretString := os.Getenv("JWTSECRET")
 	resetToken, _ := h.Mail.GenerateNonAuthToken(buyer.Email, secretString)
 	// the link to be clicked in order to perform password reset
-	link := "http://localhost:8085/reset-password?reset_token=" + *resetToken
+	//link := "http://localhost:8085/api/v1/buyerresetpassword?reset_token=" + *resetToken
+	link := "https://shoparena-frontend.vercel.app/buyer/forgot/" + *resetToken
 	// define the body of the email
 	body := "Here is your reset <a href='" + link + "'>link</a>"
 	html := "<strong>" + body + "</strong>"
@@ -77,6 +78,7 @@ func (h *Handler) BuyerForgotPasswordResetHandler(c *gin.Context) {
 
 	// gets the reset token from the dynamic route
 	resetToken, _ := c.GetQuery("reset_token")
+	log.Println(resetToken)
 
 	// decodes token to get user email
 	secretString := os.Getenv("JWTSECRET")
@@ -145,7 +147,8 @@ func (h *Handler) SellerForgotPasswordEMailHandler(c *gin.Context) {
 	secretString := os.Getenv("JWTSECRET")
 	resetToken, _ := h.Mail.GenerateNonAuthToken(seller.Email, secretString)
 	// the link to be clicked in order to perform password reset
-	link := "http://localhost:8085/reset-password?reset_token=" + *resetToken
+	//link := "http://localhost:8085/api/v1/sellerresetpassword?reset_token=" + *resetToken
+	link := "https://shoparena-frontend.vercel.app/seller/forgot/" + *resetToken
 	// define the body of the email
 	body := "Here is your reset <a href='" + link + "'>link</a>"
 	html := "<strong>" + body + "</strong>"

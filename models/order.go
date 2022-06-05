@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Order struct {
 	gorm.Model
@@ -13,10 +15,10 @@ type Order struct {
 }
 
 type OrderProducts struct {
+	Fname        string
+	Lname        string
 	CategoryName string
 	Title        string
-	Description  string
 	Price        uint
-	Images       []Image
 	Quantity     uint
 }
