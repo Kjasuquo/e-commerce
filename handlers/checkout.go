@@ -66,7 +66,7 @@ func (h *Handler) Pay(c *gin.Context) {
 		FirstName:   user.FirstName,
 		LastName:    user.LastName,
 		Email:       user.Email,
-		CallBackUrl: "http://localhost:8085/api/v1/callback",
+		CallBackUrl: "https://oja-ecommerce.herokuapp.com/api/v1/callback",
 		Reference:   *token,
 	}
 	m, err := json.Marshal(transaction)

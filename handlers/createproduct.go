@@ -76,26 +76,26 @@ func (h *Handler) CreateProducts(c *gin.Context) {
 	price, err := strconv.Atoi(c.PostForm("price"))
 	if err != nil {
 		log.Println(err)
-		response.JSON(c, "", http.StatusBadRequest, nil, []string{err.Error()})
+		response.JSON(c, "", http.StatusBadRequest, "in price", []string{err.Error()})
 		return
 	}
 
 	// err := strconv.Atoi(c.PostForm("no_of_ratings"))
 	rating, err := strconv.Atoi(c.PostForm("rating"))
 	if err != nil {
-		response.JSON(c, "", http.StatusBadRequest, nil, []string{err.Error()})
+		response.JSON(c, "", http.StatusBadRequest, "in rating", []string{err.Error()})
 		return
 	}
 
 	quantity, err := strconv.Atoi(c.PostForm("quantity"))
 	if err != nil {
 		log.Println(err)
-		response.JSON(c, "", http.StatusBadRequest, nil, []string{err.Error()})
+		response.JSON(c, "", http.StatusBadRequest, "in quantity", []string{err.Error()})
 	}
 	CategoryID, err := strconv.Atoi(c.PostForm("category_id"))
 	if err != nil {
 		log.Println(err)
-		response.JSON(c, "", http.StatusBadRequest, nil, []string{err.Error()})
+		response.JSON(c, "", http.StatusBadRequest, "in category_id", []string{err.Error()})
 	}
 
 	products := models.Product{
