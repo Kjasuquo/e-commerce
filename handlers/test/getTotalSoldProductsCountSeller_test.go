@@ -147,6 +147,7 @@ func TestGetTotalSoldProductCountSeller(t *testing.T) {
 		totalQuantity,
 		orderStatus,
 		sellerID,
+		0,
 	}
 
 	testCartProductTwo := models.CartProduct{
@@ -157,6 +158,7 @@ func TestGetTotalSoldProductCountSeller(t *testing.T) {
 		totalQuantity,
 		orderStatus,
 		sellerID,
+		0,
 	}
 
 	testCartProductThree := models.CartProduct{
@@ -167,6 +169,7 @@ func TestGetTotalSoldProductCountSeller(t *testing.T) {
 		totalQuantity,
 		orderStatus,
 		sellerID,
+		0,
 	}
 
 	sliceOfCartProduct := []models.CartProduct{testCartProductOne, testCartProductTwo, testCartProductThree}

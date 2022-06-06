@@ -121,6 +121,6 @@ func (h *Handler) CreateProducts(c *gin.Context) {
 	}
 
 	log.Println(products.Images)
-	response.JSON(c, "Product Successfully Added", http.StatusOK, products, nil)
+	c.JSON(http.StatusOK, products)
 
 }

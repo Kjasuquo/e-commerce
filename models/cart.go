@@ -16,6 +16,7 @@ type CartProduct struct {
 	TotalQuantity uint `json:"total_quantity"`
 	OrderStatus   bool `json:"order_status"`
 	SellerId      uint `json:"seller_id"`
+	BuyerId       uint `json:"buyer_id"`
 }
 
 type ProductDetails struct {

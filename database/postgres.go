@@ -756,6 +756,8 @@ func (pdb *PostgresDb) AddToCart(product models.Product, buyer *models.Buyer) er
 		TotalPrice:    prod.Price * product.Quantity,
 		TotalQuantity: product.Quantity,
 		OrderStatus:   false,
+		BuyerId:       buyer.ID,
+		SellerId:      product.SellerId,
 	}
 
 	cart.Product = append(cart.Product, cartProduct)
@@ -814,58 +816,30 @@ func (pdb *PostgresDb) ViewCartProducts(addedProducts []models.CartProduct) ([]m
 
 func (pdb *PostgresDb) DeletePaidFromCart(cartID uint) error {
 	var cartProducts []models.CartProduct
-	var product []models.Product
 
 	err := pdb.DB.Where("cart_id = ?", cartID).Where("order_status = ?", false).
 		Find(&cartProducts).Error
 	if err != nil {
 		return err
 	}
-	err = pdb.DB.Find(&product).Error
-	if err != nil {
-		return err
-	}
 
 	for i := 0; i < len(cartProducts); i++ {
-		for j := i; j < len(product); j++ {
-			if cartProducts[i].ProductID == product[j].ID {
-				var cart models.Cart
-				err := pdb.DB.Where("id = ?", cartProducts[i].CartID).First(&cart).Error
-				if err != nil {
-					return nil
-				}
-				orders := models.Order{
-					SellerId:  product[j].SellerId,
-					BuyerId:   cart.BuyerID,
-					ProductId: product[j].ID,
-				}
 
-				newQuantity := product[j].Quantity - cartProducts[i].TotalQuantity
-				err = pdb.DB.Model(&models.Product{}).Where("id=?", product[j].ID).
-					Update("quantity", newQuantity).Error
-				if err != nil {
-					return err
-				}
-
-				err = pdb.DB.Model(&models.CartProduct{}).Where("id = ?", cartProducts[i].ID).
-					Update("order_status", true).Error
-				if err != nil {
-					return err
-				}
-
-				err = pdb.DB.Create(&orders).Error
-				if err != nil {
-					return err
-				}
-
-				err = pdb.DB.Where("id = ?", cartProducts[i].ID).Delete(&models.CartProduct{}).Error
-				if err != nil {
-					return err
-				}
-
-				break
-			}
+		orders := models.Order{
+			SellerId:  cartProducts[i].SellerId,
+			BuyerId:   cartProducts[i].BuyerId,
+			ProductId: cartProducts[i].ProductID,
 		}
+
+		err = pdb.DB.Create(&orders).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	err = pdb.DB.Where("cart_id = ?", cartID).Delete(&cartProducts).Error
+	if err != nil {
+		return err
 	}
 	return nil
 }

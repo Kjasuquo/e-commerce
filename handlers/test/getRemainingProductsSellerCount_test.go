@@ -158,6 +158,7 @@ func TestGetRemainingProductCountSeller(t *testing.T) {
 		totalQuantity,
 		orderStatus,
 		0,
+		0,
 	}
 
 	testCartProductTwo := models.CartProduct{
@@ -168,6 +169,7 @@ func TestGetRemainingProductCountSeller(t *testing.T) {
 		totalQuantity,
 		orderStatus,
 		sellerID,
+		0,
 	}
 
 	bodyJSON, err := json.Marshal(products)

@@ -91,12 +91,13 @@ func CheckSupportedFile(filename string) (string, bool) {
 	fileExtension := filepath.Ext(filename)
 	return fileExtension, !supportedFileTypes[fileExtension]
 }
+
 func PreAWS(fileExtension, folder string) (*session.Session, string, error) {
 	secret := os.Getenv("AWS_SECRET_KEY")
 	id := os.Getenv("AWS_SECRET_ID")
 	tempFileName := folder + "/" + uuid.NewString() + fileExtension
 	session, err := session.NewSession(&aws.Config{
-		Region:      aws.String(os.Getenv("AWS_SECRET_REGION")),
+		Region:      aws.String(os.Getenv("AWS_REGION")),
 		Credentials: credentials.NewStaticCredentials(secret, id, ""),
 	})
 	return session, tempFileName, err
