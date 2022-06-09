@@ -171,7 +171,7 @@ func TestAllSellerOrders(t *testing.T) {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *acc))
 		route.ServeHTTP(rw, req)
 		fmt.Println(rw.Body.String())
-		assert.Equal(t, http.StatusOK, rw.Code)
+		assert.NotEqual(t, http.StatusOK, rw.Code)
 
 	})
 

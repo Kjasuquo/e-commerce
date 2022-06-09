@@ -28,6 +28,13 @@ type UpdateUser struct {
 	PhoneNumber string `json:"phone_number" binding:"required" form:"phone_number"`
 	Email       string `json:"email" binding:"required,email" form:"email"`
 	Address     string `json:"address"  form:"address"`
+	Rating      uint   `json:"rating"`
+}
+
+type UpdateRating struct {
+	Rating                  uint `json:"rating"`
+	TotalRatings            uint `json:"total_ratings"`
+	NumberOfRatingsReceived uint `json:"number_of_ratings_received"`
 }
 
 func (user *User) HashPassword() error {

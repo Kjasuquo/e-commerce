@@ -26,10 +26,14 @@ type DB interface {
 	UpdateBuyerImageURL(username, url string, buyerID uint) error
 	UpdateSellerImageURL(username, url string, sellerID uint) error
 	FindSellerByUsername(username string) (*models.Seller, error)
+	FindSellerById(Id uint) (*models.Seller, error)
+	FindProductById(Id uint) (*models.Product, error)
 	SearchProduct(lowerPrice, upperPrice, category, name string) ([]models.Product, error)
 	TokenInBlacklist(token *string) bool
 	UpdateBuyerProfile(id uint, update *models.UpdateUser) error
 	UpdateSellerProfile(id uint, update *models.UpdateUser) error
+	UpdateSellerRating(id uint, update *models.UpdateRating) error
+	UpdateProductRating(id uint, update *models.UpdateRating) error
 	UploadFileToS3(h *session.Session, file multipart.File, fileName string, size int64) (string, error)
 	CreateProduct(product models.Product) error
 	GetCategory(category string) (*models.Category, error)
