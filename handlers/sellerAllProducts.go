@@ -18,6 +18,12 @@ func (h *Handler) SellerAllProducts(c *gin.Context) {
 			"error": "unable to get products",
 		})
 	}
+	if len(sellerProducts) < 1 {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"message": "You currently do not have any products",
+		})
+		return
+	}
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"SellerProducts": sellerProducts,
 	})

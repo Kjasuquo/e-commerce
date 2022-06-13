@@ -70,7 +70,7 @@ func (p *PayStack) InitializePayment(info []byte) (string, error) {
 	return data.Data.AuthorizationUrl, nil
 }
 
-func (p *PayStack) Callback(reference string) (*http.Response, error) {
+func (p *PayStack) VerifyReference(reference string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, "https://api.paystack.co/transaction/verify/"+reference, nil)
 	if err != nil {
 		return nil, err

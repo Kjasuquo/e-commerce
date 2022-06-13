@@ -76,22 +76,4 @@ func TestCheckout(t *testing.T) {
 		assert.Contains(t, rw.Body.String(), "not valid")
 	})
 
-	t.Run("Testing for error in Call up", func(t *testing.T) {
-		mockPaystack.EXPECT().Callback(gomock.Any()).Return(nil, errors.New("error in Initializing Payment"))
-		rw := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/callback", strings.NewReader(string(transJASON)))
-		route.ServeHTTP(rw, req)
-		assert.Equal(t, http.StatusBadRequest, rw.Code)
-		assert.Contains(t, rw.Body.String(), "payment not valid")
-	})
-
-	t.Run("Testing for error in Call up", func(t *testing.T) {
-		mockPaystack.EXPECT().Callback(gomock.Any()).Return(nil, errors.New("error in Initializing Payment"))
-		rw := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/api/v1/callback", strings.NewReader(string(transJASON)))
-		route.ServeHTTP(rw, req)
-		assert.Equal(t, http.StatusBadRequest, rw.Code)
-		assert.Contains(t, rw.Body.String(), "payment not valid")
-	})
-
 }

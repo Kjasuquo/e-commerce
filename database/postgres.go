@@ -30,6 +30,9 @@ func (pdb *PostgresDb) Init(host, user, password, dbName, port string) error {
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Africa/Lagos", host, user, password, dbName, port)
 	var err error
+	if os.Getenv("DATABASE_URL") != "" {
+		dsn = os.Getenv("DATABASE_URL")
+	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err
@@ -63,100 +66,99 @@ func (pdb *PostgresDb) PrePopulateTables() error {
 		pdb.DB.Create(&categories)
 	}
 
-	user := models.User{
-		Model:           gorm.Model{},
-		FirstName:       "John",
-		LastName:        "Doe",
-		Email:           "jdoe@gmail.com",
-		Username:        "JD Baba",
-		Password:        "12345678",
-		ConfirmPassword: "12345678",
-		PasswordHash:    "$2a$12$T2wSf1qgpTyhLOons3u4JOCqCwKDDL4J3UhGdOTEBL/CmAS/RNCPm",
-		Address:         "aso rock",
-		PhoneNumber:     "09091919292",
-		Image:           "https://i.ibb.co/5jwDfyF/Photo-on-24-11-2021-at-20-45.jpg",
-		IsActive:        true,
-		Token:           "",
-	}
-	buyer := models.Buyer{
-		Model:  gorm.Model{},
-		User:   user,
-		Orders: nil,
-	}
-	result = pdb.DB.Where("buyer = ?", "John").Find(&buyer)
-
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&buyer)
-	}
-
-	seller := models.Seller{
-		Model:   gorm.Model{},
-		User:    user,
-		Product: nil,
-		Orders:  nil,
-		Rating:  5,
-	}
-	result = pdb.DB.Where("seller = ?", "John").Find(&seller)
-
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&seller)
-	}
-	product := models.Product{
-		Model:       gorm.Model{},
-		SellerId:    1,
-		CategoryId:  1,
-		Category:    models.Category{},
-		Title:       "shoes",
-		Description: "loafers",
-		Price:       30,
-		Images:      nil,
-		Rating:      4,
-		Quantity:    3,
-	}
-	Product1 := models.Product{
-		Model:       gorm.Model{},
-		SellerId:    1,
-		CategoryId:  2,
-		Category:    models.Category{},
-		Title:       "toaster",
-		Description: "sony press on toaster",
-		Price:       420,
-		Images:      nil,
-		Rating:      4,
-		Quantity:    3,
-	}
-	product2 := models.Product{
-		Model:       gorm.Model{},
-		SellerId:    1,
-		CategoryId:  3,
-		Category:    models.Category{},
-		Title:       "lip gloss",
-		Description: "fenty beauty shimmer gloss",
-		Price:       76,
-		Images:      nil,
-		Rating:      4,
-		Quantity:    3,
-	}
-	Product3 := models.Product{
-		Model:       gorm.Model{},
-		SellerId:    1,
-		CategoryId:  4,
-		Category:    models.Category{},
-		Title:       "pampers",
-		Description: "7 in 1 pamper pack",
-		Price:       100,
-		Images:      nil,
-		Rating:      4,
-		Quantity:    3,
-	}
-	result = pdb.DB.Where("title = ?", "shoes").Find(&product)
-	if result.RowsAffected < 1 {
-		pdb.DB.Create(&product)
-		pdb.DB.Create(&Product1)
-		pdb.DB.Create(&product2)
-		pdb.DB.Create(&Product3)
-	}
-
+	//user := models.User{
+	//	Model:           gorm.Model{},
+	//	FirstName:       "John",
+	//	LastName:        "Doe",
+	//	Email:           "jdoe@gmail.com",
+	//	Username:        "JD Baba",
+	//	Password:        "12345678",
+	//	ConfirmPassword: "12345678",
+	//	PasswordHash:    "$2a$12$T2wSf1qgpTyhLOons3u4JOCqCwKDDL4J3UhGdOTEBL/CmAS/RNCPm",
+	//	Address:         "aso rock",
+	//	PhoneNumber:     "09091919292",
+	//	Image:           "https://i.ibb.co/5jwDfyF/Photo-on-24-11-2021-at-20-45.jpg",
+	//	IsActive:        true,
+	//	Token:           "",
+	//}
+	//buyer := models.Buyer{
+	//	Model:  gorm.Model{},
+	//	User:   user,
+	//	Orders: nil,
+	//}
+	//result = pdb.DB.Where("buyer = ?", "John").Find(&buyer)
+	//
+	//if result.RowsAffected < 1 {
+	//	pdb.DB.Create(&buyer)
+	//}
+	//
+	//seller := models.Seller{
+	//	Model:   gorm.Model{},
+	//	User:    user,
+	//	Product: nil,
+	//	Orders:  nil,
+	//	Rating:  5,
+	//}
+	//result = pdb.DB.Where("seller = ?", "John").Find(&seller)
+	//
+	//if result.RowsAffected < 1 {
+	//	pdb.DB.Create(&seller)
+	//}
+	//product := models.Product{
+	//	Model:       gorm.Model{},
+	//	SellerId:    1,
+	//	CategoryId:  1,
+	//	Category:    models.Category{},
+	//	Title:       "shoes",
+	//	Description: "loafers",
+	//	Price:       30,
+	//	Images:      nil,
+	//	Rating:      4,
+	//	Quantity:    3,
+	//}
+	//Product1 := models.Product{
+	//	Model:       gorm.Model{},
+	//	SellerId:    1,
+	//	CategoryId:  2,
+	//	Category:    models.Category{},
+	//	Title:       "toaster",
+	//	Description: "sony press on toaster",
+	//	Price:       420,
+	//	Images:      nil,
+	//	Rating:      4,
+	//	Quantity:    3,
+	//}
+	//product2 := models.Product{
+	//	Model:       gorm.Model{},
+	//	SellerId:    1,
+	//	CategoryId:  3,
+	//	Category:    models.Category{},
+	//	Title:       "lip gloss",
+	//	Description: "fenty beauty shimmer gloss",
+	//	Price:       76,
+	//	Images:      nil,
+	//	Rating:      4,
+	//	Quantity:    3,
+	//}
+	//Product3 := models.Product{
+	//	Model:       gorm.Model{},
+	//	SellerId:    1,
+	//	CategoryId:  4,
+	//	Category:    models.Category{},
+	//	Title:       "pampers",
+	//	Description: "7 in 1 pamper pack",
+	//	Price:       100,
+	//	Images:      nil,
+	//	Rating:      4,
+	//	Quantity:    3,
+	//}
+	//result = pdb.DB.Where("title = ?", "shoes").Find(&product)
+	//if result.RowsAffected < 1 {
+	//	pdb.DB.Create(&product)
+	//	pdb.DB.Create(&Product1)
+	//	pdb.DB.Create(&product2)
+	//	pdb.DB.Create(&Product3)
+	//}
 	return nil
 
 }
@@ -962,7 +964,7 @@ func (pdb *PostgresDb) FindCartProductSeller(sellerID, productID uint) (*models.
 
 func (pdb *PostgresDb) DeleteAllSellerProducts(sellerID uint) error {
 	product := models.Product{}
-	err := pdb.DB.Where("id = ?", sellerID).Delete(&product).Error
+	err := pdb.DB.Where("seller_id = ?", sellerID).Delete(&product).Error
 	if err != nil {
 		return err
 	}

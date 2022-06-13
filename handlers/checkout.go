@@ -90,10 +90,10 @@ func (h *Handler) Pay(c *gin.Context) {
 func (h *Handler) Callback(c *gin.Context) {
 	reference := c.Query("reference")
 
-	_, err := h.Paystack.Callback(reference)
+	_, err := h.Paystack.VerifyReference(reference)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "payment not valid"})
+		c.Redirect(http.StatusFound, "https://shoparena-frontend-phi.vercel.app/buyer/payment/unsuccessful")
 		return
 	}
 
@@ -103,7 +103,7 @@ func (h *Handler) Callback(c *gin.Context) {
 	secret := os.Getenv("JWT_SECRET")
 	claims, err := h.Paystack.PayStackDecodeToken(reference, secret)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "details not valid"})
+		c.Redirect(http.StatusFound, "https://shoparena-frontend-phi.vercel.app/buyer/payment/unsuccessful")
 		return
 	}
 
@@ -123,9 +123,10 @@ func (h *Handler) Callback(c *gin.Context) {
 	err = h.DB.DeletePaidFromCart(uint(cartID))
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "cannot delete products from cart"})
+		c.Redirect(http.StatusFound, "https://shoparena-frontend-phi.vercel.app/buyer/payment/unsuccessful")
 		return
 	}
 
-	c.JSON(http.StatusOK, "payment successful")
+	c.Redirect(http.StatusFound, "https://shoparena-frontend-phi.vercel.app/buyer/payment/successful")
+	return
 }

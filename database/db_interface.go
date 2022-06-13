@@ -78,7 +78,7 @@ type Mailer interface {
 //Paystack interface
 type Paystack interface {
 	InitializePayment(info []byte) (string, error)
-	Callback(reference string) (*http.Response, error)
+	VerifyReference(reference string) (*http.Response, error)
 	PayStackDecodeToken(token, secret string) (jwt.MapClaims, error)
 }
 
@@ -101,9 +101,13 @@ type DBParams struct {
 }
 
 func InitDBParams() DBParams {
-	errEnv := godotenv.Load()
-	if errEnv != nil {
-		log.Fatal("Error loading .env file")
+	ginMode := os.Getenv("GIN_MODE")
+	log.Println(ginMode)
+	if ginMode != "release" {
+		errEnv := godotenv.Load()
+		if errEnv != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
 	host := os.Getenv("PDB_HOST")

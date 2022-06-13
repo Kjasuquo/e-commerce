@@ -51,7 +51,7 @@ func (h *Handler) SellerUpdatePassword(c *gin.Context) {
 	}
 
 	if password.NewPassword != password.ConfirmNewPassword {
-		c.JSON(400, gin.H{"message": "Password Mismatch, Please make sure newpassword & confirmNewPassword match"})
+		c.JSON(400, gin.H{"message": "Password Mismatch"})
 		c.Abort()
 		return
 	}
@@ -61,7 +61,7 @@ func (h *Handler) SellerUpdatePassword(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	c.JSON(200, gin.H{"message": "successfully reset password"})
+	c.JSON(200, gin.H{"message": "successfully reset password, please login"})
 }
 
 func (h *Handler) BuyerUpdatePassword(c *gin.Context) {
@@ -115,7 +115,7 @@ func (h *Handler) BuyerUpdatePassword(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{"message": "successfully reset password"})
+	c.JSON(200, gin.H{"message": "successfully reset password, please login"})
 }
 
 /*
